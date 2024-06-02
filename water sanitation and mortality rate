@@ -72,10 +72,9 @@ ___
 > library(ggplot2)
 > library(dplyr)
 > 
-> # Calculate R-squared values for each country
-> r_squared_values <- merged_data %>%
-+     group_by(Country) %>%
-+     summarize(r_squared = summary(lm(Deaths ~ Proportion))$r.squared)
+# Calculate a single R-squared value for the entire dataset
+model <- lm(Deaths ~ Proportion, data = merged_data)
+r_squared <- summary(model)$r.squared
 > 
 > # Create a scatter plot with separate linear regression lines for each country
 > plot <- ggplot(merged_data, aes(x = Proportion, y = Deaths, color = Country)) +
@@ -97,27 +96,12 @@ ___
 print(plot)
 `geom_smooth()` using formula = 'y ~ x'
 
-# Print R-squared values
-print(r_squared_values)
-# A tibble: 10 × 2
-   Country                  r_squared
-   <fct>                        <dbl>
- 1 Central African Republic  0.0450  
- 2 Chad                      0.881   
- 3 Eritrea                   0.000923
- 4 Ethiopia                  0.893   
- 5 India                     0.984   
- 6 Mali                      0.888   
- 7 Niger                     0.935   
- 8 Nigeria                   0.955   
- 9 Pakistan                  0.881   
-10 Somalia                   0.944   
+# Display the plot
+print(plot)
 
-
-
-
-
-
+# Print the single overall R-squared value
+print(paste("Overall R-squared value:", r_squared))
+[1] "Overall R-squared value: 0.348319462057296"
 
 
 
