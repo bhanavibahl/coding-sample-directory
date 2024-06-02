@@ -1,0 +1,124 @@
+---
+title: "Coding Sample on R: "Causal Inference Analysis of the Impact of Improved Drinking Water Sources on Mortality Rates Attributed to Unsafe Water in Selected Countries 2001-2019
+author: "Bhanavi Bahl"
+date: 31/05/2024
+---
+# Loading required libraries
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+library(readr)
+
+---
+
+# Manually creating the data frames based on the provided data
+# Data for proportion of population using improved drinking water source
+Source: United Nations SDG Water Data
+
+water_data <- data.frame(
+  Year = 2000:2019,
+  India = c(84, 85, 85, 86, 87, 87, 88, 89, 89, 90, 90, 91, 92, 92, 93, 93, 94, 95, 95, 96),
+  Chad = c(49, 50, 51, 51, 52, 53, 53, 54, 55, 56, 56, 57, 58, 58, 59, 60, 61, 61, 62, 63),
+  Pakistan = c(90, 90, 90, 91, 91, 91, 91, 92, 92, 92, 92, 93, 93, 93, 93, 94, 94, 94, 94, 94),
+  Ethiopia = c(25, 28, 31, 33, 35, 38, 40, 43, 45, 48, 51, 53, 56, 58, 60, 63, 65, 68, 70, 73),
+  Somalia = c(32, 34, 37, 40, 43, 46, 49, 50, 56, 59, 62, 65, 67, 70, 72, 75, 77, 79, 82, 82),
+  Eritrea = c(69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 68, 68, 69, 69, 69, 69, NA, NA, NA),
+  Central African Republic = c(67, 67, 67, 66, 66, 66, 66, 65, 65, 65, 65, 64, 64, 64, 64, 64, 63, 63, 63, 63),
+  Niger = c(42, 44, 45, 46, 47, 48, 49, 51, 52, 53, 54, 55, 57, 58, 59, 60, 61, 62, 64, 65),
+  Mali = c(64, 56, 58, 59, 61, 62, 64, 66, 67, 69, 70, 72, 74, 75, 77, 78, 80, 81, 83, 84),
+  Nigeria = c(53, 54, 56, 58, 59, 61, 62, 63, 65, 66, 68, 69, 71, 72, 73, 75, 76, 77, 79, 80))
+
+# View the data for inspection
+print(data)
+
+---
+
+# Uploading required CSV file (World data on share od deaths attributed to unsafe water sources)
+Source: Our World In Data
+
+# Subset only required columns (Countries and Years) from the data
+
+library(dplyr)
+
+# Vector for countries
+specified_countries <- c("India", "Pakistan", "Chad", "Somalia", "Mali", "Central African Republic", "Niger", "Nigeria", "Ethiopia", "Eritrea")
+
+# Filter the data frame to keep only the rows where the country is in the specified countries vector
+filtered_data <- world_data %>%
+  filter(Country %in% specified_countries)
+
+# Filter the data frame to keep only the rows where the year is within the range 2000 to 2019
+filtered_data <- filtered_data %>%
+  filter(Year >= 2000 & Year <= 2019)
+
+---
+
+# Renaming and Rearranging the data frames
+safe_water_source <- data_table
+
+___ 
+
+# Merging data sets
+# Merge the datasets based on 'Country' and 'Year'
+merged_data <- merge(water_borne_deaths, safe_water_source, by = c("Country", "Year"))
+
+# Subset the merged dataset to include only the desired columns
+merged_data <- merged_data[, c("Country", "Year", "Deaths", "Proportion")]
+
+___
+
+
+# Load necessary libraries
+> library(ggplot2)
+> library(dplyr)
+> 
+> # Calculate R-squared values for each country
+> r_squared_values <- merged_data %>%
++     group_by(Country) %>%
++     summarize(r_squared = summary(lm(Deaths ~ Proportion))$r.squared)
+> 
+> # Create a scatter plot with separate linear regression lines for each country
+> plot <- ggplot(merged_data, aes(x = Proportion, y = Deaths, color = Country)) +
++     geom_point(size = 1) +  # Scatter plot
++     geom_smooth(method = "lm", se = FALSE, aes(group = Country), color = "black", lwd = 0.5) +  # Separate linear regression lines for each country
++     scale_color_manual(values = country_colors) +  # Specify colors
++     labs(x = "Percentage of Population Using Safe Water Sources",
++          y = "Percentage of Deaths from Unsafe Water Sources",
++          title = "Data on water-borne disease related mortality and access to safe water sources from 2000 to 2019") +  # Labels
++     theme_minimal() +  # Theme
++     theme(
++         legend.position = "bottom",  # Legend position
++         axis.title.x = element_text(size = 10),  # X-axis title font size
++         axis.title.y = element_text(size = 10),  # Y-axis title font size
++         plot.title = element_text(size = 10)     # Plot title font size
++     )
+
+# Display the plot
+print(plot)
+`geom_smooth()` using formula = 'y ~ x'
+
+# Print R-squared values
+print(r_squared_values)
+# A tibble: 10 × 2
+   Country                  r_squared
+   <fct>                        <dbl>
+ 1 Central African Republic  0.0450  
+ 2 Chad                      0.881   
+ 3 Eritrea                   0.000923
+ 4 Ethiopia                  0.893   
+ 5 India                     0.984   
+ 6 Mali                      0.888   
+ 7 Niger                     0.935   
+ 8 Nigeria                   0.955   
+ 9 Pakistan                  0.881   
+10 Somalia                   0.944   
+
+
+
+
+
+
+
+
+
+
